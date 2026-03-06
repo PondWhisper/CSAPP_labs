@@ -1,0 +1,12 @@
+# 忽略二进制测试程序
+btest
+dlc
+fshow
+ishow
+
+# 忽略编译中间产物
+*.o
+*.tar
+
+# 忽略系统隐藏文件
+.DS_Store
