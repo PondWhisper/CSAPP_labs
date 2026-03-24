@@ -1,0 +1,49 @@
+# 1. 告诉 CPU，程序从内存地址 0 的地方开始执行
+.pos 0
+    irmovq stack, %rsp     # 初始化栈指针 (极其重要！没有它你连 call 和 ret 都用不了)
+    call main              # 跳转到主函数
+    halt                   # 停机 (相当于 C 语言的 return 0)
+
+# 2. 教授在实验指导书里要求你硬编码进去的测试链表数据
+.align 8
+ele1:
+    .quad 0x00a
+    .quad ele2
+ele2:
+    .quad 0x0b0
+    .quad ele3
+ele3:
+    .quad 0xc00
+    .quad 0
+
+# 3. 你的 main 函数
+main:
+    irmovq ele1, %rdi      # 把链表头节点 ele1 的地址，放到 %rdi (传参寄存器) 里
+    call sum_list          # 召唤你写的函数！
+    ret
+
+# ==========================================================
+# 4. 这里才是你真正要发力翻译的战场！
+# long sum_list(list_ptr ls)
+sum_list:
+    # --- 请在这里大显身手，把 examples.c 里的 sum_list 逻辑翻译成 Y86 ---
+   irmovq $0, %rax 
+   irmovq $8, %r8 
+   andq %rdi, %rdi
+   jmp test 
+    ret
+
+loop:
+   mrmovq 0(%rdi), %r9
+   addq %r9 %rax
+   mrmovq 0x8(%rdi), %rdi
+
+test:
+   andq %rdi, %rdi
+   jne loop
+   ret
+# ==========================================================
+
+# 5. 告诉 CPU，把内存地址 0x200 的地方作为“栈底”
+.pos 0x200
+stack:
