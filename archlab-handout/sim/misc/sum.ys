@@ -44,6 +44,23 @@ test:
    ret
 # ==========================================================
 
+rsum_list:
+    andq %rdi, %rdi
+    jne return_zero
+
+    mrmovq 0(%rdi),%r9
+    pushq %r9
+
+    mrmovq 0x8(%rdi),%rdi
+    call rsum_list
+
+    popq %r9
+    addq %r9, %rax
+    ret
+
+return_zero:
+    irmovq $0, %rax
+    ret
 # 5. 告诉 CPU，把内存地址 0x200 的地方作为“栈底”
 .pos 0x200
 stack:
