@@ -61,6 +61,28 @@ rsum_list:
 return_zero:
     irmovq $0, %rax
     ret
+# ==========================================================
+
+copy_block:
+    irmovq $0,%rax
+    irmovq $0x8, %r8
+    irmovq $1, %r9
+    jmp test
+
+loop:
+    mrmovq (%rdi), %r10
+    addq $r8, %rdi
+   
+    rmmovq %r10, (%rsi)
+    addq $r8, %rsi
+
+    xorq %r10, %rax
+    subq %r9, %rdx
+
+test:
+    andq %rdx, %rdx 
+    jg loop
+    ret
 # 5. 告诉 CPU，把内存地址 0x200 的地方作为“栈底”
 .pos 0x200
 stack:
