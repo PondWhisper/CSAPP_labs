@@ -46,7 +46,7 @@ test:
 
 rsum_list:
     andq %rdi, %rdi
-    jne return_zero
+    je return_zero
 
     mrmovq 0(%rdi),%r9
     pushq %r9
