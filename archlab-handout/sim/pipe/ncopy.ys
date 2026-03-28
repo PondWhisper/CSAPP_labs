@@ -20,19 +20,58 @@ ncopy:
 	andq %rdx,%rdx		# len <= 0?
 	jle Done		# if so, goto Done:
 
-Loop:	mrmovq (%rdi), %r10	# read val from src...
-	rmmovq %r10, (%rsi)	# ...and store it to dst
-	andq %r10, %r10		# val <= 0?
-	jle Npos		# if so, goto Npos:
-	irmovq $1, %r10
-	addq %r10, %rax		# count++
-Npos:	irmovq $1, %r10
-	subq %r10, %rdx		# len--
-	irmovq $8, %r10
-	addq %r10, %rdi		# src++
-	addq %r10, %rsi		# dst++
-	andq %rdx,%rdx		# len > 0?
-	jg Loop			# if so, goto Loop:
+Loop:	
+	iaddq $-4, %rdx
+	jl Tail_Check
+	iaddq $4, %rdx
+	mrmovq (%rdi), %r10	# read val from src...
+	mrmovq 8(%rdi), %r11
+	mrmovq 16(%rdi), %r12
+	mrmovq 24(%rdi), %r13
+	rmmovq %r10, (%rsi)
+	rmmovq %r11, 8(%rsi)
+	rmmovq %r12, 16(%rsi)
+	rmmovq %r13, 24(%rsi)
+Check1:
+	andq %r10, %r10		
+	jle Check2		
+	iaddq $1, %rax
+Check2:
+	andq %r11, %r11		
+	jle Check3		
+	iaddq $1, %rax
+Check3:
+	andq %r12, %r12
+	jle Check4 
+	iaddq $1, %rax
+Check4:
+	andq %r13, %r13
+	jle Npos
+	iaddq $1, %rax
+	
+Npos:	
+	iaddq $32, %rsi
+	iaddq $32, %rdi
+	iaddq $-4, %rdx
+	jge Loop			# if so, goto Loop:
+
+Tail_Check:
+	iaddq $4, %rdx	
+	andq %rdx, %rdx
+	jle Done
+
+Tail_Loop:
+	mrmovq (%rdi), %r10
+	rmmovq %r10, (%rsi)
+	andq %r10, %r10
+	jle Tail_Npos
+	iaddq $1, %rax
+
+Tail_Npos:
+	iaddq $8, %rsi
+	iaddq $8, %rdi
+	iaddq $-1, %rdx
+	jg Tail_Loop
 ##################################################################
 # Do not modify the following section of code
 # Function epilogue.
